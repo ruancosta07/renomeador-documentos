@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+    src: url("../assets/inter.ttf") format("truetype");
+    font-family: Inter;
+    font-display: swap;
+}
+
+@layer base {
+  body {
+    @apply bg-zinc-950 overflow-y-scroll;
+  }
+  * {
+    @apply leading-none;
+    font-family: Inter
+  }
+  html {
+    @apply text-[10px];
+  }
+  input, textarea {
+    @apply outline-none
+  }
+  button {
+    @apply cursor-pointer
+  }
+}
+
+@utility container-width {
+  @apply max-w-[80%] mx-auto;
+}
+
+body::-webkit-scrollbar {
+  @apply h-2 w-2
+}
+body::-webkit-scrollbar-track {
+  @apply bg-zinc-900;
+}
+body::-webkit-scrollbar-thumb{
+  @apply bg-zinc-700 rounded-[1rem]
+}
