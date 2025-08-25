@@ -49,25 +49,30 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId("com.renomeador-guia");
   if (!is.dev) {
-    autoUpdater.checkForUpdates();
-    autoUpdater.downloadUpdate();
+  app.on("ready", () => {
+    autoUpdater.checkForUpdatesAndNotify();
 
     autoUpdater.on("update-available", () => {
-      console.log("Update disponível");
+      console.log("🔄 Atualização encontrada. Baixando...");
     });
 
     autoUpdater.on("update-downloaded", () => {
-      autoUpdater.quitAndInstall();
+      console.log("✅ Atualização baixada. Reiniciando...");
+      autoUpdater.quitAndInstall(); // fecha e instala
     });
-  }
+
+    autoUpdater.on("error", (err) => {
+      console.error("❌ Erro no autoUpdater:", err);
+    });
+  });
 }
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on("browser-window-created", (_, window) => {
-    optimizer.watchWindowShortcuts(window);
-  });
+
+
+  app.on("browser-window-created", (_: any, window: any) => {
+  optimizer.watchWindowShortcuts(window);
+});
+
 
   // IPC test
   ipcMain.on("start-parse", (e, f) =>{
