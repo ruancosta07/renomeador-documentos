@@ -1,6 +1,6 @@
 {
   "name": "renomeador-guias",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Um app criado com JavaScript para automatizar o processo de renomeação de guias.",
   "main": "./out/main/index.js",
   "author": "ruancosta07",
