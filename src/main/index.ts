@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, } from "electron";
+import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import path, { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
@@ -49,41 +49,38 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId("com.renomeador-guia");
   if (!is.dev) {
-  app.on("ready", () => {
     autoUpdater.checkForUpdatesAndNotify();
+  }
 
-    autoUpdater.on("update-available", () => {
-      console.log("🔄 Atualização encontrada. Baixando...");
-    });
-
-    autoUpdater.on("update-downloaded", () => {
-      console.log("✅ Atualização baixada. Reiniciando...");
-      autoUpdater.quitAndInstall(); // fecha e instala
-    });
-
-    autoUpdater.on("error", (err) => {
-      console.error("❌ Erro no autoUpdater:", err);
-    });
+  autoUpdater.on("update-available", () => {
+    ipcMain.emit("update", "Update disponível");
+    autoUpdater.downloadUpdate();
   });
-}
 
+  autoUpdater.on("update-downloaded", () => {
+    const result = dialog.showMessageBoxSync({
+      type: "question",
+      buttons: ["Reiniciar", "Mais tarde"],
+      defaultId: 0,
+      message: "Atualização pronta. Deseja reiniciar agora?",
+    });
 
+    if (result === 0) autoUpdater.quitAndInstall();
+  });
 
   app.on("browser-window-created", (_: any, window: any) => {
-  optimizer.watchWindowShortcuts(window);
-});
-
+    optimizer.watchWindowShortcuts(window);
+  });
 
   // IPC test
-  ipcMain.on("start-parse", (e, f) =>{
+  ipcMain.on("start-parse", (e, f) => {
     extractTextFromPDFsInFolder(
       path.resolve(f.path),
       path.resolve(f.path + " - renomeado"),
       f.quality,
       mainWindow
-    )
-    }
-  );
+    );
+  });
   ipcMain.on("open-folder", async (e, f) => {
     fs.readdir(f.path, (err) => {
       if (err) {
