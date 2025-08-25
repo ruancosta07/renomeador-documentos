@@ -47,5 +47,6 @@ npmRebuild: false
 publish:
   provider: github
   owner: ruancosta07
-  repo: renomeador-documentos
+  repo: renomeador-guias
   releaseType: release
+  token: "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"

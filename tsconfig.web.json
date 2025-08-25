@@ -11,6 +11,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
+      "@/*": ["src/renderer/src/*"],
+      "@main/*": ["src/main/*"],
       "@renderer/*": ["src/renderer/src/*"]
     },
     "esModuleInterop": true

@@ -8,3 +8,4 @@ out
 teste*
 *.trained*
 .vscode
+.trigger

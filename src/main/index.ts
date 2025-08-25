@@ -19,7 +19,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
-      devTools: true
+      devTools: is.dev ? true : false,
     },
     resizable: true,
   });
@@ -48,31 +48,19 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId("com.renomeador-guia");
-
   if (!is.dev) {
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-  
-  autoUpdater.on("update-available", () => {
-   ipcMain.emit('update', "Update disponível");
+    autoUpdater.checkForUpdates();
     autoUpdater.downloadUpdate();
-  });
-  
-  autoUpdater.on("update-downloaded", () => {
-    const result = dialog.showMessageBoxSync({
-      type: "question",
-      buttons: ["Reiniciar", "Mais tarde"],
-      defaultId: 0,
-      message: "Atualização pronta. Deseja reiniciar agora?",
+
+    autoUpdater.on("update-available", () => {
+      console.log("Update disponível");
     });
-  
-    if (result === 0) autoUpdater.quitAndInstall();
-  });
-  
-  autoUpdater.on("error", (err) => {
-    ipcMain.emit("update", err);
-  });
-  
+
+    autoUpdater.on("update-downloaded", () => {
+      autoUpdater.quitAndInstall();
+    });
+  }
+}
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -82,13 +70,14 @@ app.whenReady().then(() => {
   });
 
   // IPC test
-  ipcMain.on("start-parse", (e, f) =>
+  ipcMain.on("start-parse", (e, f) =>{
     extractTextFromPDFsInFolder(
       path.resolve(f.path),
       path.resolve(f.path + " - renomeado"),
       f.quality,
       mainWindow
     )
+    }
   );
   ipcMain.on("open-folder", async (e, f) => {
     fs.readdir(f.path, (err) => {

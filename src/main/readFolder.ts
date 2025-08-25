@@ -61,7 +61,6 @@ export async function extractTextFromPDFsInFolder(
 
     const images = fs.readdirSync(imgOutDir).filter((f) => f.endsWith(".jpg"));
 
-    console.log(`Analisando arquivo - ${file}`);
     for (const image of images) {
       const imagePath = path.join(imgOutDir, image);
       const enhancedImagePath = path.join(imgOutDir, `enhanced-${image}`);
@@ -88,7 +87,7 @@ export async function extractTextFromPDFsInFolder(
         .trim()
         .replace(/—/g, "¨")
         .toLowerCase()
-        .match(/[Pres ]\s*(9\d{7,8}|10\d{6,7}|13\d{7,8}|14\d{7,8}|15\d{7,8})/g);
+        .match(/[Pres ]\s*(9\d{7,8}|10\d{6,7}|13\d{7,8})/g);
       if (matches) {
         console.log(
           matches[0].replace(/ /g, "").replace("r", "").replace("s", "")
@@ -118,8 +117,4 @@ export async function extractTextFromPDFsInFolder(
   const elapsedTime = dayjs.duration(finalTime - initialTime);
 
   await fsPromises.rm(tempDir, { recursive: true, force: true });
-
-  console.log(
-    `Duração do processo: ${elapsedTime.minutes()}:${elapsedTime.seconds()}`
-  );
 }
