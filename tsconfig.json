@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.web.json"
+    }
+  ],
+  "compilerOptions": {
+    "strict": false, // desliga o modo estrito inteiro
+    "skipLibCheck": true, // ignora erros em libs (muito usado com Electron)
+    "noImplicitAny": false // permite parâmetros sem tipo
+  }
+}
