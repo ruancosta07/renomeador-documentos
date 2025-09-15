@@ -17,7 +17,10 @@ interface Q {
 // OCR worker pool
 const cpuCount = os.cpus().length;
 const POOL_SIZE = Math.max(1, Math.min(8, Math.floor(cpuCount / 2)));
-const ocrWorkers: Array<ReturnType<typeof createWorker>> = Array.from({ length: POOL_SIZE }, () => createWorker("por"));
+const ocrWorkers: Array<ReturnType<typeof createWorker>> = Array.from(
+  { length: POOL_SIZE },
+  () => createWorker("por")
+);
 let nextWorkerIndex = 0;
 function getNextOcrWorker() {
   const worker = ocrWorkers[nextWorkerIndex % ocrWorkers.length];
@@ -65,6 +68,8 @@ export const worker = new Worker(
   { connection: { host: "127.0.0.1", port: 6379 }, concurrency: 50 }
 );
 
+
+
 async function parsePdfToJpg({
   folderPath,
   filePath,
@@ -72,6 +77,7 @@ async function parsePdfToJpg({
   length,
   outputFolder,
 }: Q) {
+  await queue.clean(0, 100, "active")
   const filename = path.basename(filePath).replace(/.pdf/g, "");
   await withConvertSlot(() =>
     pdf.convert(filePath, {
@@ -105,7 +111,10 @@ async function ocr({ ...data }: Q) {
     .match(/[Pres ]\s*(9\d{7,8}|10\d{6,7}|13\d{7,8})/g);
   progress++;
   const baseFolder = data.outputFolder.replace(/ - renomeado/g, "");
-  const current = folderProgress.get(baseFolder) || { done: 0, total: data.length };
+  const current = folderProgress.get(baseFolder) || {
+    done: 0,
+    total: data.length,
+  };
   current.done = Math.min(current.done + 1, current.total);
   current.total = data.length;
   folderProgress.set(baseFolder, current);
@@ -119,22 +128,28 @@ async function ocr({ ...data }: Q) {
     const destinationPath = path.resolve(data.outputFolder, newFileName);
     await fsp.copyFile(data.filePath, destinationPath);
     // console.log(text);
-  }
-  else {
+  } else {
     // append to erros.txt when code not found
     const errorLine = path.basename(data.filePath) + "\n";
     try {
-      await fsp.appendFile(path.join(data.outputFolder, "erros.txt"), errorLine, "utf8");
+      await fsp.appendFile(
+        path.join(data.outputFolder, "erros.txt"),
+        errorLine,
+        "utf8"
+      );
     } catch {}
   }
 }
 
 export async function closeOcrPool(): Promise<void> {
   for (const w of ocrWorkers) {
-    const worker = await w;
-    // @ts-ignore terminate exists on tesseract worker
-    if (typeof worker.terminate === "function") {
-      await worker.terminate();
+    const orcWorker = await w;
+    // @ts-ignore terminate exists on tesseract orcWorker
+    if (typeof orcWorker.terminate === "function") {
+      await orcWorker.terminate();
     }
   }
+  await queue.close();
+  await worker.close()
+
 }
